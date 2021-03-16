@@ -1,0 +1,37 @@
+syntax = "proto3";
+//import "google.protobuf.internal.well_known_types";
+import "google/protobuf/timestamp.proto";
+//import "google/protobuf/timestamp_pb2";
+
+service CrewService {
+  // Get single available pilot for given datetime and location request
+  rpc GetPilotFor(DateTimeLocationRequest) returns (PilotResponse) {}
+
+  // Schedule a flight for the given Pilot and datetime period
+  rpc ScheduleFlightFor(PilotLocationDatetimePeriodRequest) returns (ScheduleConfirmationResponse) {}
+}
+
+// Location e.g. Munich and date time period to search for next pilot
+message DateTimeLocationRequest {
+  string location = 1;
+  google.protobuf.Timestamp departure_dt = 2;
+  google.protobuf.Timestamp return_dt = 3;
+}
+
+// Identifier of next Pilot available and eligible
+message PilotResponse {
+  string pilot_id = 1;
+}
+
+// Pilot identifier, optional location and date time period
+message PilotLocationDatetimePeriodRequest {
+  string pilot_id = 1;
+  optional string location = 2;
+  google.protobuf.Timestamp departure_dt = 3;
+  google.protobuf.Timestamp return_dt = 4;
+}
+
+// Success or failure response for pilot scheduling request
+message ScheduleConfirmationResponse {
+  string status = 1;
+}
