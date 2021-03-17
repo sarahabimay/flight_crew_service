@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 grpcio = "*"
 grpcio-tools = "*"
+pathlib = "*"
+arrow = "*"
 
 [dev-packages]
 pytest = "*"
