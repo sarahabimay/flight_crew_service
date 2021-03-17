@@ -4,19 +4,11 @@ import sys
 import arrow
 from functools import partial
 
-class CrewRepository():
+from src.adapters.outgoing.persistence.repository import Repository
+
+class CrewRepository(Repository):
     def __init__(self, location):
-        self.location = os.path.expanduser(location)
-        self.load(self.location)
-
-    def load(self, location):
-        if os.path.exists(location):
-            self._load()
-        else:
-            self.db = {}
-
-    def _load(self):
-        self.db = json.load(open(self.location, "r"))
+        Repository.__init__(self, location)
 
     def get_pilots_for(self, base_location, departure_dt, return_dt):
         self.load(self.location)
@@ -27,9 +19,7 @@ class CrewRepository():
                     location = base_location,
                     departure_dow = departure_day,
                     return_dow = return_day)
-        pilots = list(filter(by_base_and_dow_part, self.db['Crew']))
-
-        return pilots
+        return list(filter(by_base_and_dow_part, self.db['Crew']))
 
     def _by_location_and_dow(self, pilot, location, departure_dow, return_dow):
         if pilot['Base'] == location and departure_dow in pilot['WorkDays'] and return_dow in pilot['WorkDays']:
@@ -49,10 +39,3 @@ class CrewRepository():
         }
         iso_dow = arrow.get(a_datetime).isoweekday()
         return ISO_DOW_TO_DAY_STRING[iso_dow]
-
-    def writedb(self):
-        try:
-            json.dump(self.db, open(self.location, "w+"), allow_nan=False)
-            return True
-        except:
-            return False

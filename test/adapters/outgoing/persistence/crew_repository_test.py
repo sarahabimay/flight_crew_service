@@ -4,28 +4,7 @@ import json
 import arrow
 
 import src.adapters.outgoing.persistence.crew_repository as repo
-
-@pt.fixture
-def db_path():
-    return os.path.dirname(os.path.abspath(__file__))
-
-@pt.fixture
-def nonexistent_db(db_path):
-    return db_path + "/db_location/nonexistent.json"
-
-@pt.fixture
-def invalid_crew(db_path):
-    return db_path + "/db_location/invalid_crew.json"
-
-@pt.fixture
-def skeleton_crew(db_path):
-    return db_path + "/db_location/skeleton_crew.json"
-
-@pt.fixture
-def write_fail(db_path):
-    file_path = db_path + "/db_location/write_fail.json"
-    json.dump({}, open(file_path, "w"))
-    return file_path
+from fixtures.repository import db_path, nonexistent_db, invalid_crew, skeleton_crew, write_fail
 
 def test_does_not_load_data_store_file_successfully(nonexistent_db):
     test_repository = repo.CrewRepository(nonexistent_db)

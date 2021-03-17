@@ -1,0 +1,20 @@
+[
+  {
+    "ID": 1,
+    "Base": "Munich",
+    "DepartureDateTime": "2020-05-01T09:00:00Z",
+    "ReturnDateTime": "2020-05-03T11:00:00Z"
+  },
+  {
+    "ID": 2,
+    "Base": "Munich",
+    "DepartureDateTime": "2020-06-01T09:00:00Z",
+    "ReturnDateTime": "2020-06-03T11:00:00Z"
+  },
+  {
+    "ID": 3,
+    "Base": "Munich",
+    "DepartureDateTime": "2022-06-01T09:00:00Z",
+    "ReturnDateTime": "2022-06-03T11:00:00Z"
+  }
+]
