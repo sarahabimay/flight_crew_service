@@ -1,5 +1,5 @@
-from src.adapters.incoming.usecases.find_pilot_use_case import find_pilot_for
-from src.adapters.incoming.usecases.schedule_flight_use_case import schedule_flight_for
+from .usecases.find_pilot_use_case import find_pilot_for
+from .usecases.schedule_flight_use_case import schedule_flight_for
 from pipetools import pipe, maybe
 from collections import namedtuple
 import arrow

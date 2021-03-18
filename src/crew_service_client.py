@@ -14,14 +14,12 @@ stub = CrewServiceStub(channel)
 timestamp_instance = timestamp_pb2.Timestamp()
 timestamp_instance.FromJsonString('2020-05-01T09:00:00Z')
 departure_dt = timestamp_instance
-print("Departure time:")
-print(departure_dt.ToJsonString())
+print("Departure time:", departure_dt.ToJsonString())
 
 # Convert datetime string to grpc Timestamp
 timestamp_instance.FromJsonString('2020-05-03T11:00:00Z')
 return_dt = timestamp_instance
-print("Return time:")
-print(return_dt.ToJsonString())
+print("Return time:", return_dt.ToJsonString())
 
 location_and_period = DateTimeLocationRequest(
         location='Munich',

@@ -17,7 +17,6 @@ class FlightsRepository(Repository):
         return list(filter(upcoming_flights_part, self.db))
 
     def _upcoming_flight(self, pilot_ids, flight):
-        print('next flight', flight)
         if flight['ID'] in pilot_ids and self._future_date(flight['DepartureDateTime']):
             return True
         else:

@@ -9,7 +9,10 @@ from adapters.incoming.controller import find_crew_for, schedule_crew_for
 
 class CrewServiceServicer(CrewServiceServicer):
     def GetPilotFor(self, request, context):
-        print("Find pilot for ", request.location, request.departure_dt, request.return_dt)
+        print("Find pilot for: ",
+                request.location,
+                request.departure_dt.ToJsonString(),
+                request.return_dt.ToJsonString())
 
         pilot = find_crew_for(request)
         if pilot is None:
@@ -18,6 +21,11 @@ class CrewServiceServicer(CrewServiceServicer):
             return PilotResponse(pilot_id=pilot.id)
 
     def ScheduleFlightFor(self, request, context):
+        print("Schedule flight for pilot_id=",
+                request.pilot_id,
+                request.location,
+                request.departure_dt.ToJsonString(),
+                request.return_dt.ToJsonString())
         pilot = schedule_crew_for(request)
         if pilot is None:
             return ScheduleConfirmationResponse(status="Not Scheduled")
