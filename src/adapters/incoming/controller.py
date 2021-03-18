@@ -10,17 +10,57 @@ FindCrewResponse = namedtuple('FindCrewResponse', ['id'])
 ScheduleCrewRequest = namedtuple('FindCrewRequest', ['pilot_id', 'location', 'depart_on', 'return_on'])
 ScheduleCrewResponse = namedtuple('FindCrewResponse', ['status'])
 
-def validate(request):
+def find_crew_for(request):
+    pilot = (request > maybe
+            | _validate
+            | _find_crew_params
+            | _convert_datetimes
+            | _find_crew_request
+            | find_pilot_for
+            )
+
+    if pilot:
+        return FindCrewResponse(id=pilot['ID'])
+
+    return None
+
+def schedule_crew_for(request):
+    flight = (request > maybe
+            | _validate
+            | _schedule_crew_params
+            | _convert_datetimes
+            | _schedule_crew_request
+            | schedule_flight_for
+            )
+
+    if flight:
+        return ScheduleCrewResponse(status=flight['status'])
+
+    return None
+
+def _validate(request):
     return request
 
-def convert_datetimes(request):
+def _find_crew_params(request):
+    converted_request = {}
+    converted_request['location'] = request.location
+    converted_request['departure_dt'] = request.departure_dt
+    converted_request['return_dt'] = request.return_dt
+    return converted_request
+
+def _schedule_crew_params(request):
+    converted_request = _find_crew_params(request)
+    converted_request.update({'pilot_id': request.pilot_id})
+    return converted_request
+
+def _convert_datetimes(request):
     try:
         depart_on = arrow.get(request['departure_dt'].ToDatetime())
         return_on = arrow.get(request['return_dt'].ToDatetime())
         request.update({
-                'departure_dt': depart_on,
-                'return_dt': return_on,
-                })
+            'departure_dt': depart_on,
+            'return_dt': return_on
+            })
         return request
     except:
         print("exception:", sys.exc_info())
@@ -43,29 +83,3 @@ def _schedule_crew_request(request):
             depart_on = depart_on,
             return_on = return_on)
 
-
-def find_crew_for(request):
-    pilot = (request > maybe
-            | validate
-            | convert_datetimes
-            | _find_crew_request
-            | find_pilot_for
-            )
-
-    if pilot:
-        return FindCrewResponse(id=pilot['ID'])
-
-    return None
-
-def schedule_crew_for(request):
-    flight = (request > maybe
-            | validate
-            | convert_datetimes
-            | _schedule_crew_request
-            | schedule_flight_for
-            )
-
-    if flight:
-        return ScheduleCrewResponse(status=flight['status'])
-
-    return None

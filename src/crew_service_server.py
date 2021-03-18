@@ -1,27 +1,24 @@
 from concurrent import futures
-import logging
-
-import grpc
 
 from crew_service_pb2 import PilotResponse, ScheduleConfirmationResponse
 from crew_service_pb2_grpc import CrewServiceServicer, add_CrewServiceServicer_to_server
-import adapters.incoming.controller
 
-def get_pilot_for(pilot_id, pilot_db):
-    return None
+import grpc
+import logging
+from adapters.incoming.controller import find_crew_for, schedule_crew_for
 
 class CrewServiceServicer(CrewServiceServicer):
     def GetPilotFor(self, request, context):
         print("Find pilot for ", request.location, request.departure_dt, request.return_dt)
 
-        pilot = controller.find_crew_for(request)
+        pilot = find_crew_for(request)
         if pilot is None:
             return PilotResponse(pilot_id="")
         else:
             return PilotResponse(pilot_id=pilot.id)
 
     def ScheduleFlightFor(self, request, context):
-        pilot = controller.schedule_flight_for(request)
+        pilot = schedule_crew_for(request)
         if pilot is None:
             return ScheduleConfirmationResponse(status="Not Scheduled")
         else:
