@@ -36,6 +36,7 @@ else:
 
 pilot_and_period = PilotLocationDatetimePeriodRequest(
         pilot_id="123",
+        location='Berlin',
         departure_dt=departure_dt,
         return_dt=return_dt)
 

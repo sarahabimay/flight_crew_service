@@ -8,9 +8,11 @@ grpcio = "*"
 grpcio-tools = "*"
 pathlib = "*"
 arrow = "*"
+pipetools = "*"
 
 [dev-packages]
 pytest = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.9"

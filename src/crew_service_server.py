@@ -5,26 +5,27 @@ import grpc
 
 from crew_service_pb2 import PilotResponse, ScheduleConfirmationResponse
 from crew_service_pb2_grpc import CrewServiceServicer, add_CrewServiceServicer_to_server
-import adapters.incoming.usecases.find_pilot_use_case as find_pilot
-# from find_pilot_use_case import find_pilot_for
+import adapters.incoming.controller
 
 def get_pilot_for(pilot_id, pilot_db):
     return None
 
 class CrewServiceServicer(CrewServiceServicer):
     def GetPilotFor(self, request, context):
-        pilot = find_pilot.find_pilot_for(request.location, request.departure_dt, request.return_dt)
+        print("Find pilot for ", request.location, request.departure_dt, request.return_dt)
+
+        pilot = controller.find_crew_for(request)
         if pilot is None:
             return PilotResponse(pilot_id="")
         else:
-            return pilot
+            return PilotResponse(pilot_id=pilot.id)
 
     def ScheduleFlightFor(self, request, context):
-        pilot = get_pilot_for(request.pilot_id, "pilot_db")
+        pilot = controller.schedule_flight_for(request)
         if pilot is None:
             return ScheduleConfirmationResponse(status="Not Scheduled")
         else:
-            return ScheduleConfirmationResponse(status="Scheduled")
+            return ScheduleConfirmationResponse(pilot.status)
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
