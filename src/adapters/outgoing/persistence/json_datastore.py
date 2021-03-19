@@ -22,10 +22,10 @@ class JsonDataStore(QueryInterface):
         self.repositories = {}
         self._load_entities(entity_config, entity_factory)
 
-    def get_pilots_for(self, base_location, departure_dt, return_dt):
+    def get_pilots_for(self, base_location, depart_on, return_on):
         if self.repositories:
-            departure_day = self._day_of_the_week(departure_dt)
-            return_day = self._day_of_the_week(return_dt)
+            departure_day = self._day_of_the_week(depart_on)
+            return_day = self._day_of_the_week(return_on)
 
             by_base_and_dow_part = partial(self._by_location_and_dow,
                                            location=base_location,
@@ -53,25 +53,18 @@ class JsonDataStore(QueryInterface):
             return flights_by_pilot
         return {}
 
-    def schedule_flight_for(self, pilot, location, departure_dt, return_dt):
-        depart_on = arrow.get(departure_dt)
-        return_on = arrow.get(return_dt)
-        if depart_on < arrow.utcnow() or return_on < depart_on:
-            return {'status': 'ScheduleError: InvalidDate'}
-        elif self._any_clashes_for(pilot, depart_on, return_on):
-            return {'status': 'ScheduleError: Clash'}
-        else:
-            flight = {
-                'ID': pilot,
-                'Base': location,
-                'DepartureDateTime': departure_dt,
-                'ReturnDateTime': return_dt
-            }
-            self._flights_repository().append(flight)
-            return {
-                'status': 'Scheduled',
-                'flight': flight
-            }
+    def schedule_flight_for(self, pilot_id, location, depart_on, return_on):
+        flight = {
+            'ID': pilot_id,
+            'Base': location,
+            'DepartureDateTime': depart_on,
+            'ReturnDateTime': return_on
+        }
+        self._flights_repository().append(flight)
+        return {
+            'status': 'Scheduled',
+            'flight': flight
+        }
 
     def _load_entities(self, entity_config, entity_factory):
         if isinstance(entity_factory, EntityFactory):
@@ -111,16 +104,3 @@ class JsonDataStore(QueryInterface):
     def _future_date(datetime):
         return arrow.get(datetime) > arrow.utcnow()
 
-    def _any_clashes_for(self, pilot, depart_on, return_on):
-        upcoming_flights = self.get_upcoming_flights_for([pilot])
-        for flight in upcoming_flights:
-            flight_depart = arrow.get(flight['DepartureDateTime'])
-            flight_return = arrow.get(flight['ReturnDateTime'])
-            if (
-                    flight_depart < depart_on < flight_return
-                    or flight_depart < return_on < flight_return
-                    or depart_on <= flight_depart and flight_return <= return_on
-            ):
-                return True
-
-        return False

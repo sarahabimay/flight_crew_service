@@ -33,7 +33,6 @@ class CrewServiceServicer(CrewServiceServicer):
             request.return_dt.ToJsonString()))
 
         pilot = self.controller.find_crew_for(request)
-        print("Pilot found:", pilot)
         if pilot is None:
             return PilotResponse(pilot_id="")
         else:
@@ -50,7 +49,7 @@ class CrewServiceServicer(CrewServiceServicer):
         if pilot is None:
             return ScheduleConfirmationResponse(status="Not Scheduled")
         else:
-            return ScheduleConfirmationResponse(pilot.status)
+            return ScheduleConfirmationResponse(status=pilot.status)
 
 
 def serve():

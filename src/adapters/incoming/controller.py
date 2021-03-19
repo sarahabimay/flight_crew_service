@@ -74,7 +74,6 @@ class Controller():
             })
             return request
         except:
-            print("exception:", sys.exc_info())
             return None
 
     @staticmethod

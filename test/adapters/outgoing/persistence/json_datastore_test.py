@@ -68,7 +68,8 @@ def with_flight_history(skeleton_crew, flights_history, factory):
          {'entity_name': 'flights', 'location': flights_history}],
         factory)
 
-class TestJsonDataStore():
+
+class TestJsonDataStore:
     def test_does_not_load_any_repositories(self, factory):
         json_datastore = JsonDataStore([], factory)
         assert json_datastore.repositories == {}
@@ -145,31 +146,7 @@ class TestJsonDataStore():
                 "ReturnDateTime": "2021-12-03T11:00:00Z"
             }
         }
-        assert valid_datastore.schedule_flight_for(pilot=2, location='Munich', departure_dt="2021-12-01T09:00:00Z",
-                                                   return_dt="2021-12-03T11:00:00Z") == expected
+        assert valid_datastore.schedule_flight_for(pilot_id=2, location='Munich', depart_on="2021-12-01T09:00:00Z",
+                                                   return_on="2021-12-03T11:00:00Z") == expected
         assert valid_datastore.get_upcoming_flights_for(pilots=[2]) == [expected_flight]
 
-    def test_handles_schedule_clashes_with_departure_time(self, valid_datastore):
-        expected = {'status': 'ScheduleError: Clash'}
-        assert valid_datastore.schedule_flight_for(pilot=3, location='Munich', departure_dt="2022-06-02T09:00:00Z",
-                                                   return_dt="2022-06-05T11:00:00Z") == expected
-
-    def test_handles_schedule_clashes_with_return_time(self, valid_datastore):
-        expected = {'status': 'ScheduleError: Clash'}
-        assert valid_datastore.schedule_flight_for(pilot=3, location='Munich', departure_dt="2022-05-22T09:00:00Z",
-                                                   return_dt="2022-06-02T11:00:00Z") == expected
-
-    def test_handles_schedule_clashes_with_depart_and_return_time(self, valid_datastore):
-        expected = {'status': 'ScheduleError: Clash'}
-        assert valid_datastore.schedule_flight_for(pilot=3, location='Munich', departure_dt="2022-06-01T09:00:00Z",
-                                                   return_dt="2022-06-03T11:00:00Z") == expected
-
-    def test_does_not_schedule_departure_date_in_past(self, valid_datastore):
-        expected = {'status': 'ScheduleError: InvalidDate'}
-        assert valid_datastore.schedule_flight_for(pilot=3, location='Munich', departure_dt="2019-06-01T09:00:00Z",
-                                                   return_dt="2022-05-03T11:00:00Z") == expected
-
-    def test_does_not_schedule_for_unordered_depart_and_return_date(self, valid_datastore):
-        expected = {'status': 'ScheduleError: InvalidDate'}
-        assert valid_datastore.schedule_flight_for(pilot=3, location='Munich', departure_dt="2021-06-01T09:00:00Z",
-                                                   return_dt="2020-05-03T11:00:00Z") == expected
