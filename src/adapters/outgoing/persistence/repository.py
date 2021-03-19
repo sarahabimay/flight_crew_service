@@ -4,6 +4,7 @@ import json
 class Repository():
     def __init__(self, location):
         self.location = os.path.expanduser(location)
+        self.db = {}
         self.load(self.location)
 
     def load(self, location):
