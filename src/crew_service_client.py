@@ -21,25 +21,33 @@ timestamp_instance.FromJsonString('2020-05-03T11:00:00Z')
 return_dt = timestamp_instance
 print("Return time:", return_dt.ToJsonString())
 
+departure_location = 'Munich'
 location_and_period = DateTimeLocationRequest(
-        location='Munich',
-        departure_dt=departure_dt,
-        return_dt=return_dt)
+    location=departure_location,
+    departure_dt=departure_dt,
+    return_dt=return_dt)
 
 pilot_response = stub.GetPilotFor(location_and_period)
 if pilot_response.pilot_id:
-    print("Pilot available for location and time period: %s" % (pilot_response.pilot_id))
+    print("Pilot: ID: {} is the next eligible pilot from Base: {} between: {} -> {}".format(pilot_response.pilot_id,
+                                                                                            departure_location,
+                                                                                            departure_dt.ToJsonString(),
+                                                                                            return_dt.ToJsonString()))
 else:
     print("No pilot found for given location and time period")
 
+departure_location = 'Berlin'
 pilot_and_period = PilotLocationDatetimePeriodRequest(
-        pilot_id="123",
-        location='Berlin',
-        departure_dt=departure_dt,
-        return_dt=return_dt)
+    pilot_id='123',
+    location='Berlin',
+    departure_dt=departure_dt,
+    return_dt=return_dt)
 
 schedule_response = stub.ScheduleFlightFor(pilot_and_period)
 if schedule_response.status == "Scheduled":
-    print("Pilot scheduled for flight in a time period: %s" % (pilot_response.pilot_id))
+    print("Pilot: ID: {} was scheduled for a flight from {} between {} -> {}".format(pilot_response.pilot_id,
+                                                                                     departure_location,
+                                                                                     departure_dt.ToJsonString(),
+                                                                                     return_dt.ToJsonString()))
 else:
     print("No flight scheduled for given pilot and time period")

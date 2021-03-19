@@ -19,7 +19,7 @@ class CrewServiceServicer(CrewServiceServicer):
             config = []
             config.append({'entity_name': 'crew',
                            'location': os.environ['CREW_REPOSITORY']}) if 'CREW_REPOSITORY' in os.environ else None
-            config.append({'entity_name': 'flight', 'location': os.environ[
+            config.append({'entity_name': 'flights', 'location': os.environ[
                 'FLIGHTS_REPOSITORY']}) if 'FLIGHTS_REPOSITORY' in os.environ else None
 
             self.controller = Controller(JsonDataStore(config, EntityFactory()))
@@ -33,10 +33,11 @@ class CrewServiceServicer(CrewServiceServicer):
             request.return_dt.ToJsonString()))
 
         pilot = self.controller.find_crew_for(request)
+        print("Pilot found:", pilot)
         if pilot is None:
             return PilotResponse(pilot_id="")
         else:
-            return PilotResponse(pilot_id=pilot.id)
+            return PilotResponse(pilot_id=str(pilot.id))
 
     def ScheduleFlightFor(self, request, context):
         print("Schedule flight for pilot_id={}, location={}, depart date={}, return date={}".format(

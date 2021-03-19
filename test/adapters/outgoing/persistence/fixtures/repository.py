@@ -37,6 +37,11 @@ def scheduled_flights(db_path):
 
 
 @pt.fixture
+def flights_history(db_path):
+    return db_path + "/db_location/flights_history.json"
+
+
+@pt.fixture
 def write_fail(db_path):
     file_path = db_path + "/db_location/write_fail.json"
     json.dump({}, open(file_path, "w"))

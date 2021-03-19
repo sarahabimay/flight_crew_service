@@ -5,7 +5,7 @@ import pytest as pt
 from src.adapters.outgoing.persistence.entity_factory import EntityFactory
 from src.adapters.outgoing.persistence.json_datastore import JsonDataStore
 
-from fixtures.repository import skeleton_crew, scheduled_flights, db_path, invalid_crew
+from fixtures.repository import skeleton_crew, scheduled_flights, db_path, invalid_crew, flights_history
 
 
 @pt.fixture()
@@ -61,6 +61,13 @@ def find_multiple():
     }
 
 
+@pt.fixture
+def with_flight_history(skeleton_crew, flights_history, factory):
+    return JsonDataStore(
+        [{'entity_name': 'crew', 'location': skeleton_crew},
+         {'entity_name': 'flights', 'location': flights_history}],
+        factory)
+
 class TestJsonDataStore():
     def test_does_not_load_any_repositories(self, factory):
         json_datastore = JsonDataStore([], factory)
@@ -114,6 +121,13 @@ class TestJsonDataStore():
             "ReturnDateTime": "2022-06-03T11:00:00Z"
         }]
         assert valid_datastore.get_upcoming_flights_for(pilots=[3]) == expected
+
+    def test_get_all_flights_by_pilot(self, with_flight_history):
+        expected = {
+            1: [{'Base': 'Munich', 'ID': 1}, {'Base': 'Berlin', 'ID': 1}],
+            3: [{'Base': 'Munich', 'ID': 3}]
+        }
+        assert with_flight_history.get_all_flights_grouped_by_pilot() == expected
 
     def test_schedule_flight_successfully(self, valid_datastore):
         expected_flight = {
