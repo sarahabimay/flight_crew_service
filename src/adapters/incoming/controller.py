@@ -33,7 +33,7 @@ class Controller():
         return None
 
     def schedule_crew_for(self, request):
-        flight = (request > maybe
+        status = (request > maybe
                   | self._validate
                   | self._schedule_crew_params
                   | self._convert_datetimes
@@ -41,8 +41,8 @@ class Controller():
                   | partial(schedule_flight_for, self.datastore)
                   )
 
-        if flight:
-            return ScheduleCrewResponse(status=flight['status'])
+        if status:
+            return ScheduleCrewResponse(status=status['status'])
 
         return None
 

@@ -19,15 +19,12 @@ def schedule_flight_for(datastore, schedule_flight_request):
                 return {'status': 'ScheduleError: InvalidDate'}
             return _schedule_flight_for(datastore, pilot_id, location, depart_on, return_on)
         else:
-            return {'status': 'Unscheduled: Unknown Pilot'}
+            return {'status': 'Unscheduled: Ineligible Pilot'}
 
     return None
 
 
 def _invalid_dates(depart_on, return_on):
-    depart_on = arrow.get(depart_on)
-    return_on = arrow.get(return_on)
-
     return depart_on < arrow.utcnow() or return_on < depart_on
 
 
@@ -46,12 +43,6 @@ def _any_clashes_for(pilot, depart_on, return_on, datastore):
     return False
 
 
-def _schedule_flight_for(datastore, pilot, location, departure_dt, return_dt):
-    depart_on = arrow.get(departure_dt)
-    return_on = arrow.get(return_dt)
-
-    if depart_on < arrow.utcnow() or return_on < depart_on:
-        return {'status': 'ScheduleError: InvalidDate'}
-
+def _schedule_flight_for(datastore, pilot, location, depart_on, return_on):
     datastore.schedule_flight_for(pilot, location, depart_on, return_on)
     return {'status': 'Scheduled'}

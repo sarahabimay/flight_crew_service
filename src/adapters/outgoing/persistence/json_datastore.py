@@ -61,10 +61,7 @@ class JsonDataStore(QueryInterface):
             'ReturnDateTime': return_on
         }
         self._flights_repository().append(flight)
-        return {
-            'status': 'Scheduled',
-            'flight': flight
-        }
+        return flight
 
     def _load_entities(self, entity_config, entity_factory):
         if isinstance(entity_factory, EntityFactory):

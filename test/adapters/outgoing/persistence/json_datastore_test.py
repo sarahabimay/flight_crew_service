@@ -138,15 +138,14 @@ class TestJsonDataStore:
             "ReturnDateTime": "2021-12-03T11:00:00Z"
         }
         expected = {
-            'status': 'Scheduled',
-            'flight': {
-                "ID": 2,
-                "Base": "Munich",
-                "DepartureDateTime": "2021-12-01T09:00:00Z",
-                "ReturnDateTime": "2021-12-03T11:00:00Z"
-            }
+            "ID": 2,
+            "Base": "Munich",
+            "DepartureDateTime": "2021-12-01T09:00:00Z",
+            "ReturnDateTime": "2021-12-03T11:00:00Z"
         }
-        assert valid_datastore.schedule_flight_for(pilot_id=2, location='Munich', depart_on="2021-12-01T09:00:00Z",
+        assert valid_datastore.schedule_flight_for(pilot_id=2,
+                                                   location='Munich',
+                                                   depart_on="2021-12-01T09:00:00Z",
                                                    return_on="2021-12-03T11:00:00Z") == expected
         assert valid_datastore.get_upcoming_flights_for(pilots=[2]) == [expected_flight]
 

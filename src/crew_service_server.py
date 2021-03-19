@@ -45,11 +45,11 @@ class CrewServiceServicer(CrewServiceServicer):
             request.departure_dt.ToJsonString(),
             request.return_dt.ToJsonString()))
 
-        pilot = self.controller.schedule_crew_for(request)
-        if pilot is None:
+        status = self.controller.schedule_crew_for(request)
+        if status is None:
             return ScheduleConfirmationResponse(status="Not Scheduled")
         else:
-            return ScheduleConfirmationResponse(status=pilot.status)
+            return ScheduleConfirmationResponse(status=status.status)
 
 
 def serve():

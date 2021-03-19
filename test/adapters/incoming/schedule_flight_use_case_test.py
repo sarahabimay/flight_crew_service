@@ -62,63 +62,57 @@ class JsonDataStoreFake:
         self.schedule_flight_has_been_called = True
 
 
-def test_does_not_schedule_flight_if_no_datastore(valid_request):
-    pilot = uc.schedule_flight_for(None, valid_request)
+class TestScheduleFlightUseCase:
+    def test_does_not_schedule_flight_if_no_datastore(self, valid_request):
+        status = uc.schedule_flight_for(None, valid_request)
 
-    assert pilot is None
+        assert status is None
 
+    def test_does_not_schedule_flight_if_no_pilot_found_for_request_params(self, valid_request):
+        status = uc.schedule_flight_for(JsonDataStoreFake(pilots=[]), valid_request)
 
-def test_does_not_schedule_flight_if_no_pilot_found_for_request_params(valid_request):
-    pilot = uc.schedule_flight_for(JsonDataStoreFake(pilots=[]), valid_request)
+        assert status == {'status': 'Unscheduled: Ineligible Pilot'}
 
-    assert pilot is None
+    def test_does_not_schedule_flight_when_not_eligible(self, ineligible_pilot_request):
+        datastore = JsonDataStoreFake()
 
+        status = uc.schedule_flight_for(datastore, ineligible_pilot_request)
 
-def test_does_not_schedule_flight_when_not_eligible(ineligible_pilot_request):
-    datastore = JsonDataStoreFake()
+        assert status == {'status': 'Unscheduled: Ineligible Pilot'}
 
-    status = uc.schedule_flight_for(datastore, ineligible_pilot_request)
+    def test_schedules_flight_when_eligible(self, valid_request):
+        datastore = JsonDataStoreFake()
+        status = uc.schedule_flight_for(datastore, valid_request)
 
-    assert status is None
+        assert status == {'status': 'Scheduled'}
+        assert datastore.schedule_flight_has_been_called is True
 
+    def test_schedules_flight_when_eligible_and_no_clash(self, valid_request):
+        datastore = JsonDataStoreFake()
+        status = uc.schedule_flight_for(datastore, valid_request)
 
-def test_schedules_flight_when_eligible(valid_request):
-    datastore = JsonDataStoreFake()
-    status = uc.schedule_flight_for(datastore, valid_request)
+        assert status == {'status': 'Scheduled'}
+        assert datastore.schedule_flight_has_been_called is True
 
-    assert status['status'] is 'Scheduled'
-    assert datastore.schedule_flight_has_been_called is True
+    def test_does_not_schedule_flight_when_clash(self, clash_with_schedule_request):
+        datastore = JsonDataStoreFake()
+        status = uc.schedule_flight_for(datastore, clash_with_schedule_request)
 
+        assert status['status'] == 'ScheduleError: Clash'
+        assert datastore.schedule_flight_has_been_called is False
 
-def test_schedules_flight_when_eligible_and_no_clash(valid_request):
-    datastore = JsonDataStoreFake()
-    status = uc.schedule_flight_for(datastore, valid_request)
+    def test_does_not_schedule_departure_date_in_past(self, dates_passed_request):
+        datastore = JsonDataStoreFake()
+        status = uc.schedule_flight_for(datastore, dates_passed_request)
 
-    assert status['status'] == 'Scheduled'
-    assert datastore.schedule_flight_has_been_called is True
+        expected = 'ScheduleError: InvalidDate'
+        assert status['status'] == expected
+        assert datastore.schedule_flight_has_been_called is False
 
+    def test_does_not_schedule_for_unordered_depart_and_return_date(self, invalid_dates):
+        datastore = JsonDataStoreFake()
+        status = uc.schedule_flight_for(datastore, invalid_dates)
 
-def test_does_not_schedule_flight_when_clash(clash_with_schedule_request):
-    datastore = JsonDataStoreFake()
-    status = uc.schedule_flight_for(datastore, clash_with_schedule_request)
-
-    assert status['status'] == 'ScheduleError: Clash'
-    assert datastore.schedule_flight_has_been_called is False
-
-
-def test_does_not_schedule_departure_date_in_past(dates_passed_request):
-    datastore = JsonDataStoreFake()
-    status = uc.schedule_flight_for(datastore, dates_passed_request)
-
-    expected = 'ScheduleError: InvalidDate'
-    assert status['status'] == expected
-    assert datastore.schedule_flight_has_been_called is False
-
-
-def test_does_not_schedule_for_unordered_depart_and_return_date(invalid_dates):
-    datastore = JsonDataStoreFake()
-    status = uc.schedule_flight_for(datastore, invalid_dates)
-
-    expected = 'ScheduleError: InvalidDate'
-    assert status['status'] == expected
-    assert datastore.schedule_flight_has_been_called is False
+        expected = 'ScheduleError: InvalidDate'
+        assert status['status'] == expected
+        assert datastore.schedule_flight_has_been_called is False
